@@ -1,59 +1,38 @@
+import Sheet from "./sheet.js";
+import Time from "./time.js";
+
 const user = document.getElementById("user");
 const work = document.getElementById("work");
 const saveWorkBtn = document.getElementById("saveWorkBtn");
 const showtimeList = document.getElementById("showTimeList");
 
-let dayOrNight = "day";
-
-if (localStorage.getItem("timeSheet")) {
-    console.log("Det finns LS");
-} else {
-    console.log("Finns inget LS");
-
-    let timeSheet = [
-        {id:1, user:"Janne", work: 7},
-        {id:2, user:"Kalle", work: 2},
-        {id:3, user:"Bengt", work: 18},
-    ];
-
-    localStorage.setItem("timeSheet", JSON.stringify(timeSheet));
-}
+// SKAPA VÅR KEDJA
+let timeSheet = new Sheet();
 
 saveWorkBtn.addEventListener("click", () => {
 
-        // HÄMTA
-        let timeSheet = JSON.parse(localStorage.getItem("timeSheet"));
 
         // SKAPA NYTT OBJEKT
         let newWorkTime = {
-            id: timeSheet.length + 1,
             user: user.value,
             work: Number(work.value)
         }
 
-        console.log("newWrokTime", newWorkTime);
+      //  console.log("newWorkTime", newWorkTime);
 
         // ÄNDRA
-        timeSheet.push(newWorkTime);
-
-        // SPARA
-        localStorage.setItem("timeSheet", JSON.stringify(timeSheet));
-   
+        timeSheet.addTime(new Time(newWorkTime));
 
     console.log("timeSheet", timeSheet);
 
-    printTimes();
+    setTimeout(printTimes, 100);
 })
 
 function printTimes() {
     showtimeList.innerHTML = "";
 
-    // HÄMTA
-    let timeSheet = JSON.parse(localStorage.getItem("timeSheet"));
-    console.log("hämtad från LS", timeSheet);
-
-    timeSheet.map(work => {
-        console.log("Tiderna för sig", work);
+    timeSheet.timeSheet.map(work => {
+        console.log("Tiderna för sig", work.data.user);
 
         let timeBox = document.createElement("div");
         timeBox.style.border = "1px solid black";
@@ -69,23 +48,9 @@ function printTimes() {
         }
     
         timeBox.id = work.id;
-        timeBox.innerHTML = "<p>" + work.user + "<br/>" + work.work + "</p>";
+        timeBox.innerHTML = "<p>" + work.data.user + "<br/>" + work.data.work + "</p>";
         
         showtimeList.appendChild(timeBox);
     })
 }
 
-function printNightActivities() {
-    showtimeList.innerHTML = "";
-
-    showtimeList.insertAdjacentHTML("afterbegin", "<p>DU FÅR INTE SE TIDER PÅ NATTEN</p>");
-}
-
-// CONDITIONAL RENDERING
-if (dayOrNight === "day") {
-    printTimes();
-} else {
-    printNightActivities();
-}
-
-// INIT
