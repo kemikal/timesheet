@@ -14,12 +14,21 @@ export default class Time {
         let hashBuffer = await crypto.subtle.digest("SHA-256", msgInt8);
         let hashArray = Array.from(new Uint8Array(hashBuffer));
         let hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-        console.log("hashHex", hashHex);
+        // console.log("hashHex", hashHex);
         return hashHex;  
     }
 
-    async mineBlock() {
+    async mineBlock(difficulty) {
         // MAJNA ETT BLOCK
+        let tryHash = await this.calculateHash();
+        // console.log("tryHash", tryHash);
+
+        while (!tryHash.toString().startsWith("0".repeat(difficulty))) {
+            this.nonce++;
+            tryHash = await this.calculateHash(this.nonce);
+            //console.log("tryHash", tryHash);
+        }
+        this.hash = tryHash;
     }
 
 }
